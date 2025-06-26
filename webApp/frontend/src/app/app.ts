@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {MetricService} from './services/metric-service';
-import {interval } from 'rxjs';
+import {timer } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -16,20 +16,16 @@ export class App implements OnInit, OnDestroy{
 
   constructor(private metricService : MetricService) {}
 
-  getMetric(){
-    return this.metricService.getMetrics();
-  }
-
-
   ngOnInit() {
     // Création d'un intervalle qui émet toutes les 1500 ms
-    this.intervalSub = interval(1500).subscribe(() => {
+    timer(0, 10000).subscribe(val => {
       this.metricService.getMetrics().subscribe({
         next: data => {
           this.metrics = data;
           console.log("Données mises à jour", data);
         },
         error: err => {
+          this.metrics = null;
           console.error("Erreur de récupération des métriques :", err);
         }
       });
@@ -37,10 +33,7 @@ export class App implements OnInit, OnDestroy{
   }
 
   ngOnDestroy() {
-    // Important pour éviter les fuites de mémoire
-    if (this.intervalSub) {
-      this.intervalSub.unsubscribe();
-    }
+
   }
 
 
