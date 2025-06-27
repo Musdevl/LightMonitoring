@@ -4,6 +4,8 @@ const port = 9000;
 
 const agentRouter = require("./routes/agentRouter")
 
+app.use(express.json());
+
 app.use("/agent", agentRouter);
 
 app.listen(port, () => {

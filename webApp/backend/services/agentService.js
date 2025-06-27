@@ -1,3 +1,7 @@
-let agents = {"test1" : "test2"}
+let agents = {}
 
 exports.getAgents = () => Object.values(agents);
+
+exports.saveAgent = (val) => {
+    agents[val.hostname] = val;
+}
