@@ -18,7 +18,7 @@ export class App implements OnInit, OnDestroy{
 
   ngOnInit() {
     // Création d'un intervalle qui émet toutes les 1500 ms
-    timer(0, 10000).subscribe(val => {
+    timer(0, 3000).subscribe(val => {
       this.metricService.getMetrics().subscribe({
         next: data => {
           this.metrics = data;
