@@ -3,7 +3,7 @@ import requests
 url = "http://localhost:9000/agent/register"
 
 agent_data = {
-    "hostname": "pc-test-python",
+    "hostname": "pc-test-python2",
     "ip": "192.168.0.101",
 }
 
