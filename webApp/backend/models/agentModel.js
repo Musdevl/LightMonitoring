@@ -7,7 +7,7 @@ const agentSchema = Joi.object({
     config: Joi.object({
         location: Joi.string().optional(),
         refreshInterval: Joi.number().min(50).max(60000).default(5000),
-    }).optional(),
+    }).optional().default({ refreshInterval: 5000 }),
 });
 
 module.exports = agentSchema;
