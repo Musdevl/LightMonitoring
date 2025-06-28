@@ -1,43 +1,44 @@
 <router-outlet />
-<h1>Monitoring Système</h1>
 
-<section>
-  <h2>🧠 CPU</h2>
-  <p>Utilisation : {{ metrics.cpu }} %</p>
-</section>
+<div class="page">
+  <h1>Agent Monitoring</h1>
 
-<section>
-  <h2>💾 RAM</h2>
-  <ul>
-    <li>Total : {{ metrics.ram?.total  }} bytes</li>
-    <li>Utilisée : {{ metrics.ram?.used }} bytes</li>
-    <li>Libre : {{ metrics.ram?.free  }} bytes</li>
-    <li>Pourcentage : {{ metrics.ram?.percent }}%</li>
-    <li>Active : {{ metrics.ram?.active  }}</li>
-    <li>Inactive : {{ metrics.ram?.inactive  }}</li>
-  </ul>
-</section>
+  <div class="stats">
+    <div class="stat">
+      <span class="number">{{ agents.length }}</span>
+      <span class="label">Total Agents</span>
+    </div>
+  </div>
 
-<section>
-  <h2>🗃️ Disque</h2>
-  <ul>
-    <li>Total : {{ metrics.disk?.total  }} bytes</li>
-    <li>Utilisé : {{ metrics.disk?.used  }} bytes</li>
-    <li>Libre : {{ metrics.disk?.free }} bytes</li>
-    <li>Pourcentage : {{ metrics.disk?.percent }}%</li>
-  </ul>
-</section>
+  <div class="agents" *ngIf="agents.length > 0; else noAgents">
+    <div class="agent-card" *ngFor="let agent of agents">
 
-<section>
-  <h2>🌐 Réseau</h2>
-  <ul>
-    <li>Envoyés : {{ metrics.net?.bytes_sent  }} bytes</li>
-    <li>Reçus : {{ metrics.net?.bytes_recv  }} bytes</li>
-    <li>Paquets envoyés : {{ metrics.net?.packets_sent }}</li>
-    <li>Paquets reçus : {{ metrics.net?.packets_recv }}</li>
-    <li>Erreurs entrantes : {{ metrics.net?.errin }}</li>
-    <li>Erreurs sortantes : {{ metrics.net?.errout }}</li>
-    <li>Paquets perdus en entrée : {{ metrics.net?.dropin }}</li>
-    <li>Paquets perdus en sortie : {{ metrics.net?.dropout }}</li>
-  </ul>
-</section>
+      <div class="agent-main">
+        <h3>{{ agent.hostname }}</h3>
+        <p class="ip">{{ agent.ip }}</p>
+      </div>
+
+      <div class="agent-details" *ngIf="agent.config">
+        <div class="detail" *ngIf="agent.config.location">
+          <span class="label">Location:</span>
+          <span class="value">{{ agent.config.location }}</span>
+        </div>
+
+        <div class="detail">
+          <span class="label">Refresh:</span>
+          <span class="value">{{ agent.config?.refreshInterval || 5000 }}ms</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template #noAgents>
+    <div class="empty">
+      <h3>No agents available</h3>
+      <p>Waiting for agents to connect...</p>
+      <button (click)="refreshAgents()">Refresh</button>
+    </div>
+  </ng-template>
+
+</div>

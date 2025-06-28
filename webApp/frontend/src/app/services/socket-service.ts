@@ -1,12 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { io, Socket } from 'socket.io-client';
+import {AgentService} from './agent-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
 
-  private apiUrl = 'http://127.0.0.1:8000'
-  constructor(private http: HttpClient) {}
+  private socket: Socket;
+  private TAG : string = "[Socket-Service]  - ";
 
+  constructor(private agentService : AgentService) {
+    this.socket = io('http://localhost:9000');
+
+    this.socket.on('connect', () => {
+      console.log('Socket connecté avec id:', this.socket.id);
+    });
+
+    this.socket.on('new_agent', () => {
+      console.log(this.TAG + " New agent, update agents");
+      this.agentService.updateAgents();
+    })
+
+  }
 }

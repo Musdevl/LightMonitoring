@@ -2,6 +2,9 @@ from fastapi import FastAPI
 import psutil
 from fastapi.middleware.cors import CORSMiddleware
 
+backendUrl = "http://localhost:9000"
+
+
 app = FastAPI()
 
 

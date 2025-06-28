@@ -1,40 +1,33 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {MetricService} from './services/metric-service';
-import {timer } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import {AgentService} from './services/agent-service';
+import {SocketService} from './services/socket-service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App implements OnInit, OnDestroy{
-  protected title = 'frontend';
+export class App {
+  title = 'frontend';
+  agents: any[] = [];
 
-  metrics: any = {};
-
-  constructor(private metricService : MetricService) {}
-
-  ngOnInit() {
-    // Création d'un intervalle qui émet toutes les 1500 ms
-    timer(0, 3000).subscribe(val => {
-      this.metricService.getMetrics().subscribe({
-        next: data => {
-          this.metrics = data;
-          console.log("Données mises à jour", data);
-        },
-        error: err => {
-          this.metrics = null;
-          console.error("Erreur de récupération des métriques :", err);
-        }
-      });
+  constructor(private agentService: AgentService, socketService: SocketService) {
+    this.agentService.agents$.subscribe({
+      next: (data: any[]) => {
+        this.agents = data;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
     });
+
+    this.agentService.updateAgents();
   }
 
-  ngOnDestroy() {
-
+  refreshAgents() {
+    this.agentService.updateAgents();
   }
-
-
 }

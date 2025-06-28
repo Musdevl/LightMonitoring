@@ -1,5 +1,6 @@
 const agentService = require('../services/agentService');
 const agentSchema = require("../models/agentModel")
+const socketManager = require("../socketManager")
 
 exports.getAllAgent = (req, res) => {
     res.json(agentService.getAgents());
@@ -13,4 +14,6 @@ exports.createAgent = (req, res) => {
 
     agentService.saveAgent(value);
     res.status(200).json({"message" : "Agent correctement enregistré ", "agent" : value});
+
+    socketManager.getIO().emit("new_agent");
 }
