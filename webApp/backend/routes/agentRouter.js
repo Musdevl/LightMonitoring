@@ -4,4 +4,5 @@ const agentController = require("../controllers/agentController")
 
 router.get("/", agentController.getAllAgent)
 router.post("/register", agentController.createAgent)
+router.delete("/unregister", agentController.deleteAgent)
 module.exports = router

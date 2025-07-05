@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI
 import psutil
 import requests
@@ -15,22 +16,67 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+hostname = socket.gethostname()
+ip = "127.0.0.1"
+SLEEP_TIME = 5
+
+running = True
+metrics_task = None
+
 def register_agent():
-    """Register this agent with the backend"""
     try:
-        hostname = socket.gethostname()
-        ip = "127.0.0.1"  # Simple IP for now
-        
         agent_data = {
             "hostname": hostname,
             "ip": ip
         }
-        
-        response = requests.post(f"{backendUrl}/agent/register", json=agent_data)
+        requests.post(f"{backendUrl}/agent/register", json=agent_data)
         print(f"Agent registered: {hostname}")
-        
     except Exception as e:
         print(f"Registration failed: {e}")
+
+def unregister_agent():
+    try:
+        requests.delete(f"{backendUrl}/agent/unregister/", json={
+            "hostname": hostname
+        })
+        print(f"Agent unregistered: {hostname}")
+    except Exception as e:
+        print(f"Unregistration failed: {e}")
+
+def collect_metrics():
+    return {
+        "hostname": hostname,
+        "cpu": psutil.cpu_percent(),
+        "ram": psutil.virtual_memory()._asdict(),
+        "disk": psutil.disk_usage("/")._asdict(),
+        "net": psutil.net_io_counters()._asdict()
+    }
+
+async def push_metrics_periodically():
+    while running:
+        try:
+            metrics = collect_metrics()
+            response = requests.post(f"{backendUrl}/agent/metrics", json=metrics)
+            print("📤 Metrics sent")
+        except Exception as e:
+            print(f"❌ Failed to send metrics: {e}")
+        await asyncio.sleep(SLEEP_TIME)
+
+
+@app.on_event("startup")
+async def startup():
+    global metrics_task
+    register_agent()
+    metrics_task = asyncio.create_task(push_metrics_periodically())
+
+@app.on_event("shutdown")
+async def shutdown():
+    global running
+    global metrics_task
+    running = False
+    unregister_agent()
+    if metrics_task:
+        await metrics_task
 
 @app.get("/status")
 def get_status():
@@ -38,16 +84,7 @@ def get_status():
 
 @app.get("/metrics")
 def get_metrics():
-    return {
-        "cpu": psutil.cpu_percent(),
-        "ram": psutil.virtual_memory()._asdict(),
-        "disk": psutil.disk_usage("/")._asdict(),
-        "net": psutil.net_io_counters()._asdict()
-    }
-
-@app.on_event("startup")
-async def startup():
-    register_agent()
+    return collect_metrics()
 
 if __name__ == "__main__":
     import uvicorn

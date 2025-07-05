@@ -17,3 +17,11 @@ exports.createAgent = (req, res) => {
 
     socketManager.getIO().emit("new_agent");
 }
+
+exports.deleteAgent = (req, res) => {
+    data = req.body;
+    if(!data.hostname){
+        return res.status(400).json({"error" : "Hostname manquant"});
+    }
+    agentService.deleteAgent(data.hostname);
+}
