@@ -1,0 +1,43 @@
+
+<div class="page">
+  <h1>Agent Monitoring</h1>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="number">{{ agents.length }}</span>
+      <span class="label">Total Agents</span>
+    </div>
+  </div>
+
+  <div class="agents" *ngIf="agents.length > 0; else noAgents">
+    <div class="agent-card" *ngFor="let agent of agents" (click)="goToAgentDetail(agent)">
+
+      <div class="agent-main">
+        <h3>{{ agent.hostname }}</h3>
+        <p class="ip">{{ agent.ip }}</p>
+      </div>
+
+      <div class="agent-details" *ngIf="agent.config">
+        <div class="detail" *ngIf="agent.config.location">
+          <span class="label">Location:</span>
+          <span class="value">{{ agent.config.location }}</span>
+        </div>
+
+        <div class="detail">
+          <span class="label">Refresh:</span>
+          <span class="value">{{ agent.config?.refreshInterval || 5000 }}ms</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template #noAgents>
+    <div class="empty">
+      <h3>No agents available</h3>
+      <p>Waiting for agents to connect...</p>
+      <button (click)="refreshAgents()">Refresh</button>
+    </div>
+  </ng-template>
+
+</div>

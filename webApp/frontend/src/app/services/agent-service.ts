@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {MetricService} from './metric-service';
 import { BehaviorSubject } from 'rxjs';
+import {Agent} from '../model/agent.model';
 
 
 @Injectable({
@@ -8,7 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class AgentService {
 
-  public agents$ = new BehaviorSubject<any[]>([]);
+  public agents$ = new BehaviorSubject<Agent[]>([]);
   private TAG : string = "[Agent-Service] - ";
 
   constructor(private metricService : MetricService) {
@@ -17,7 +18,7 @@ export class AgentService {
   updateAgents() {
 
     this.metricService.getAllAgents().subscribe({
-      next: (data: any[]) => {
+      next: (data: Agent[]) => {
         this.agents$.next(data);
         console.log(this.TAG + "All agents updated");
       },
