@@ -13,15 +13,17 @@ exports.createAgent = (req, res) => {
     }
 
     agentService.saveAgent(value);
-    res.status(200).json({"message" : "Agent correctement enregistré ", "agent" : value});
-
     socketManager.getIO().emit("new_agent");
+    res.status(200).json({"message" : "Agent correctement enregistré ", "agent" : value});
 }
 
 exports.deleteAgent = (req, res) => {
-    data = req.body;
+    let data = req.body;
     if(!data.hostname){
         return res.status(400).json({"error" : "Hostname manquant"});
     }
     agentService.deleteAgent(data.hostname);
+    socketManager.getIO().emit("delete_agent");
+    res.status(200).json({"message" : "Agent correctement supprimé"})
+
 }

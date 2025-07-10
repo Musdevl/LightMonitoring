@@ -4,17 +4,10 @@ import psutil
 import requests
 import socket
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+import httpx
 
 backendUrl = "http://localhost:9000"
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 hostname = socket.gethostname()
 ip = "127.0.0.1"
@@ -23,7 +16,7 @@ SLEEP_TIME = 5
 running = True
 metrics_task = None
 
-def register_agent():
+async def register_agent():
     try:
         agent_data = {
             "hostname": hostname,
@@ -34,14 +27,26 @@ def register_agent():
     except Exception as e:
         print(f"Registration failed: {e}")
 
-def unregister_agent():
+async def unregister_agent():
     try:
-        requests.delete(f"{backendUrl}/agent/unregister/", json={
-            "hostname": hostname
-        })
+        requests.delete(f"{backendUrl}/agent/unregister", json={
+             "hostname": hostname
+        }, timeout = 10)
         print(f"Agent unregistered: {hostname}")
     except Exception as e:
         print(f"Unregistration failed: {e}")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await register_agent()
+    """metrics_task = asyncio.create_task(push_metrics_periodically())
+    yield
+    global running
+    running = False
+    metrics_task.cancel()"""
+    yield
+    await unregister_agent()
+
 
 def collect_metrics():
     return {
@@ -63,20 +68,23 @@ async def push_metrics_periodically():
         await asyncio.sleep(SLEEP_TIME)
 
 
-@app.on_event("startup")
-async def startup():
-    global metrics_task
-    register_agent()
-    metrics_task = asyncio.create_task(push_metrics_periodically())
 
-@app.on_event("shutdown")
-async def shutdown():
-    global running
-    global metrics_task
-    running = False
-    unregister_agent()
-    if metrics_task:
-        await metrics_task
+
+
+
+app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+
 
 @app.get("/status")
 def get_status():

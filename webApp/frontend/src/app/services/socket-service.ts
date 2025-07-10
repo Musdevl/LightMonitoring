@@ -22,5 +22,10 @@ export class SocketService {
       this.agentService.updateAgents();
     })
 
+    this.socket.on('delete_agent', () => {
+      console.log(this.TAG + " Delete agent, update agents");
+      this.agentService.updateAgents();
+    })
+
   }
 }

@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {Router, RouterOutlet} from '@angular/router';
 import { CommonModule } from '@angular/common';
+import {SocketService} from './services/socket-service';
 
 
 @Component({
@@ -12,4 +13,7 @@ import { CommonModule } from '@angular/common';
 export class App {
   title = 'LightMonitoring';
 
+  // On fait ça pour instancier le socketService sinon il marche pas
+  constructor(private socketService : SocketService) {
+  }
 }

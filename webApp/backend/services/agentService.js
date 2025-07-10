@@ -8,5 +8,6 @@ exports.saveAgent = (val) => {
 }
 
 exports.deleteAgent = (hostname) => {
+    console.log("Agent deleted : " + hostname);
     delete agents[hostname];
 }
