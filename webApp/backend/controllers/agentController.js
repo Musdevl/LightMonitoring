@@ -6,13 +6,14 @@ exports.getAllAgent = (req, res) => {
     res.json(agentService.getAgents());
 }
 
-exports.createAgent = (req, res) => {
+exports.createAgent = async (req, res) => {
     const { error, value } = agentSchema.validate(req.body);
     if (error) {
         return res.status(400).json({"error" : "Model de schema non respecté", "details" : error.details});
     }
 
-    agentService.saveAgent(value);
+    await agentService.saveAgent(value);
+
     socketManager.getIO().emit("new_agent");
     res.status(200).json({"message" : "Agent correctement enregistré ", "agent" : value});
 }
