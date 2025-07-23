@@ -1,9 +1,10 @@
 const agentService = require('../services/agentService');
 const agentSchema = require("../models/agentModel")
 const socketManager = require("../socketManager")
+const {valueOf} = require("express");
 
 exports.getAllAgent = (req, res) => {
-    res.json(agentService.getAgents());
+    res.json(Object.values(agentService.getAgents()));
 }
 
 exports.createAgent = async (req, res) => {

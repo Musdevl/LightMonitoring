@@ -20,7 +20,7 @@ export class AgentService {
     this.metricService.getAllAgents().subscribe({
       next: (data: Agent[]) => {
         this.agents$.next(data);
-        console.log(this.TAG + "All agents updated");
+        console.log(this.TAG + "All agents updated : ", data);
       },
       error: (err: any) => {
         console.log(this.TAG + "Error while getting all agents");
@@ -28,6 +28,15 @@ export class AgentService {
       }
     });
 
+  }
+
+  getAgentByName(hostname : string) : Agent | null {
+
+    /*
+    If there is multiple agent with the same name, the first in the list order will be picked
+     */
+
+    return this.agents$.value.find((agent: Agent) => agent.hostname === hostname) || null;
   }
 
 

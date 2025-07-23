@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import {AgentService} from '../../services/agent-service';
+import {SocketService} from '../../services/socket-service';
 import {Agent} from '../../model/agent.model';
 import {Router} from '@angular/router';
 
@@ -17,7 +18,7 @@ export class Home {
 
   agents: Agent[] = [];
 
-  constructor(private agentService: AgentService, private router : Router) {
+  constructor(private agentService: AgentService, private router : Router, private socketService : SocketService) {
     this.agentService.agents$.subscribe({
       next: (data: Agent[]) => {
         this.agents = data;
@@ -35,6 +36,5 @@ export class Home {
   }
 
   goToAgentDetail(agent : Agent) {
-    this.router.navigate(['/agent', agent.hostname]);
-  }
+    this.router.navigate(['/agent', agent.hostname]);}
 }

@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import {AgentService} from './agent-service';
+import {Agent} from '../model/agent.model';
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +30,17 @@ export class SocketService {
       this.agentService.updateAgents();
     })
 
+    this.socket.on('backend_error', (data) => {
+      console.log(this.TAG + "Backend error : ", data);
+    })
+  }
+
+
+  watchAgent(agent : Agent) {
+    this.socket.emit('watch_agent', agent);
+  }
+
+  unwatchAgent(agent : Agent) {
+    this.socket.emit('unwatch_agent', agent);
   }
 }

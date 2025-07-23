@@ -2,7 +2,7 @@ const pool = require("../db");
 
 let agents = {};
 
-exports.getAgents = () => Object.values(agents);
+exports.getAgents = () => agents;
 
 exports.saveAgent = async (val) => {
     console.log("New agent : " + val.hostname);
@@ -21,7 +21,7 @@ exports.saveAgent = async (val) => {
         return result.rows[0]; // retour utile si besoin
     } catch (err) {
         if (err.code === "23505") {
-            console.log(`[Agent Service] - Agent "${hostname}" déjà existant`);
+            console.log(`[Agent Service] - Agent "${hostname}" déjà existant dans la database`);
             throw new Error("Agent déjà enregistré");
         } else {
             console.error("[Agent Service] - Erreur SQL :", err);
