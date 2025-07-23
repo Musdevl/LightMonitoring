@@ -5,6 +5,7 @@ let io;
 
 let agentWatched = new Map();
 
+exports.getWatchersMap = () => agentWatched;
 
 function addWatcher(agent, socket) {
 
@@ -101,6 +102,8 @@ exports.initSocket = (server) => {
     });
 };
 
+exports.sendNewData = (socket, data) =>
+    socket.emit('new_data', data);
 
 exports.getIO = () => {
     if (!io) {
